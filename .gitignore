@@ -1,0 +1,16 @@
+.env
+.DS_Store
+node_modules
+public
+.tmp
+.idea
+.log
+dist
+docs
+npm-debug.log
+.nyc_output
+coverage
+cassettes
+errors.log
+infos.log
+upload
