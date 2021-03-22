@@ -57,6 +57,7 @@
     "sharp": "^0.25.2",
     "short-hash": "^1.0.0",
     "sleep-promise": "^8.0.1",
+    "smartmeter-obis": "^2.3.0",
     "timekeeper": "^2.2.0",
     "uuid": "^8.0.0",
     "winston": "^3.2.1"
