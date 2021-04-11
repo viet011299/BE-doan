@@ -33,8 +33,9 @@ exports.create = async (req, res) => {
 exports.profile = (req, res) => {
   res.jsonp(req.user)
 }
-exports.list = (req, res) => {
-  res.jsonp('Ok')
+exports.list = async(req, res) => {
+  let user = await User.find()
+  handleSuccess(res, 201, user, 'Cập nhật thành công')
 }
 exports.update = async (req, res) => {
   const reqUser = req.user

@@ -15,7 +15,6 @@ function runBasicStaff() {
     .then(() => {
       console.log('%s MongoDB Connected', chalk.green('✓'))
       schedule.scheduleJobs()
-      require('./app/libs/common').init()
     })
     .catch(err => {
       console.log('%s Connect MongoDB Fail'), chalk.red('X')
