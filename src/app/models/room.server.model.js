@@ -18,7 +18,7 @@ const roomSchema = new Schema(
         type:Schema.Types.ObjectId,
         required:[true,"Please choice building Id"]
     },
-    fool:{
+    floor:{
         type:Number,
         required:[true,"Please choice fool in building"]
     }

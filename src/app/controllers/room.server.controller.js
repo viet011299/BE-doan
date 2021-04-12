@@ -15,14 +15,12 @@ exports.list = async (req, res) => {
     }
 }
 
-
-
 exports.create = async (req, res) => {
     try {
         const body = req.body;
         console.log(body)
-        if (!body.fool || body.fool <= 0 || body.fool == null) {
-            return handleError(res, 400, "Fool not Invalid")
+        if (!body.floor || body.floor <= 0 || body.floor == null) {
+            return handleError(res, 400, "floor not Invalid")
         }
         if (!body.buildingId) {
             return handleError(res, 400, "Building null")
@@ -31,8 +29,8 @@ exports.create = async (req, res) => {
         if (!checkBuilding) {
             return handleError(res, 400, "Building not exist")
         }
-        if (body.fool > checkBuilding.numberFloor) {
-            return handleError(res, 400, "Fool not available")
+        if (body.floor > checkBuilding.numberFloor) {
+            return handleError(res, 400, "floor not available")
         }
         const newItem = new Room(req.body)
         await newItem.save()
@@ -54,10 +52,9 @@ exports.update = async (req, res) => {
     try {
         const item = req.item
         const body = req.body
-
         const building = await Building.findOne({ _id: item.buildingId })
-        if (body.fool || body.fool == 0) {
-            if (body.fool <= 0 || body.fool > building.numberFloor) return handleError(res, 400, "Fool not Invalid")
+        if (body.floor || body.floor == 0) {
+            if (body.floor <= 0 || body.floor > building.numberFloor) return handleError(res, 400, `Floor not Invalid  must in (${1},${building.numberFloor}) `)
         }
         _.assignIn(item, body)
         await item.save()
