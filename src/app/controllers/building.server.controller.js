@@ -17,6 +17,7 @@ const fillRoomForFloor = (listFloors, listRoomOfBuilding) => {
   })
   return result
 }
+
 exports.list = async (req, res) => {
   try {
     const list = await Building.find();
@@ -31,14 +32,15 @@ exports.list = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const body = req.body;
-    body.buildingID = body.buildingID ? body.buildingID.toUpperCase() : ""
-    const newItem = new Building(req.body)
+    body.buildingName = body.buildingName ? body.buildingName.toUpperCase() : ""
+    const newItem = new Building(body)
     await newItem.save()
     return handleSuccess(res, 200, newItem, "Success")
   } catch (error) {
     handleError(res, 400, error.message)
   }
 }
+
 exports.read = async (req, res) => {
   try {
     const item = req.item
@@ -51,7 +53,6 @@ exports.read = async (req, res) => {
       listFools.push(newFloor)
     }
     const listRoomOfBuilding = await Room.find({ buildingId: helper.getObjectId(item) });
-    console.log(listRoomOfBuilding);
     const listRoomByFloor = fillRoomForFloor(listFools, listRoomOfBuilding)
     handleSuccess(res, 200, { item, listRoomByFloor }, 'Success')
   } catch (error) {
@@ -63,8 +64,8 @@ exports.update = async (req, res) => {
   try {
     const item = req.item
     const body = req.body
-    if (body.buildingID) {
-      body.buildingID = body.buildingID.toUpperCase()
+    if (body.buildingName) {
+      body.buildingName = body.buildingName.toUpperCase()
     }
     _.assignIn(item, body)
     await item.save()

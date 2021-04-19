@@ -4,12 +4,11 @@ const Schema = mongoose.Schema
 const helper = require('../libs/helper')
 const buildingSchema = new Schema(
   {
-    buildingID: {
+    buildingName: {
       type: String,
-      unique:true,
-      required:[true,"Build Id is null"]
+      required:[true,"Building Name is null"]
     },
-    buildingName:{
+    buildingInfo:{
         type:String
     },
     numberFloor:{

@@ -6,7 +6,9 @@ const meterSchema = new Schema(
   {
     meterId: {
       type: String,
-      unique: true
+    },
+    roomName: {
+      type: String,
     },
   },
   {

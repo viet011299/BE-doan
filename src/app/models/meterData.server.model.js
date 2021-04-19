@@ -5,8 +5,7 @@ const helper = require('../libs/helper')
 const meterDataSchema = new Schema(
   {
     meterId: { type: String },
-    time:Date,
-    power:Number
+    time: Date,
   },
   {
     usePushEach: true,
