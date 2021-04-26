@@ -60,6 +60,35 @@ exports.read = async (req, res) => {
   }
 }
 
+exports.getAll = async (req, res) => {
+  try {
+    const list = await Building.find();
+    const result = []
+    console.log("a");
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i]
+      const listFools = []
+      for (let i = 1; i <= item.numberFloor; i++) {
+        const newFloor = {
+          floorNumber: i,
+          listRooms: []
+        }
+        listFools.push(newFloor)
+      }
+      const listRoomOfBuilding = await Room.find({ buildingId: helper.getObjectId(item) });
+      const listRoomByFloor = fillRoomForFloor(listFools, listRoomOfBuilding)
+      result.push({
+        building: item,
+        listRoomByFloor
+      })
+    }
+
+    handleSuccess(res, 200, result, 'Success')
+  } catch (error) {
+    handleError(res, 400, error.message)
+  }
+}
+
 exports.update = async (req, res) => {
   try {
     const item = req.item

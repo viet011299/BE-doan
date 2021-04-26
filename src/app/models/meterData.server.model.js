@@ -6,6 +6,10 @@ const meterDataSchema = new Schema(
   {
     meterId: { type: String },
     time: Date,
+    v:Number,
+    a:Number,
+    kWh:Number,
+    w:Number
   },
   {
     usePushEach: true,

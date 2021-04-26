@@ -6,9 +6,22 @@ const meterSchema = new Schema(
   {
     meterId: {
       type: String,
+      required: [true, "Meter id is not null"]
+    },
+    roomId: {
+      type: Schema.ObjectId,
     },
     roomName: {
-      type: String,
+      type: String
+    },
+    buildingName: {
+      type: String
+    },
+    floor: {
+      type: Number
+    },
+    buildingId: {
+      type: Schema.ObjectId,
     },
   },
   {
