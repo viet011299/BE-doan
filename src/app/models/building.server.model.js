@@ -6,7 +6,8 @@ const buildingSchema = new Schema(
   {
     buildingName: {
       type: String,
-      required:[true,"Building Name is null"]
+      required:[true,"Building Name is null"],
+          unique: true,
     },
     buildingInfo:{
         type:String

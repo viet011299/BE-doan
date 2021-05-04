@@ -6,7 +6,7 @@ exports.handleError = async (res, code = 400, message) => {
     combinedMessage = _.trim(_.last(message.split(':')))
   }
   if (message.match(/duplicate key/)){
-    combinedMessage = "Đã tồn tại bản ghi này"
+    combinedMessage = "Data exist"
   }
 
   return res.status(code).jsonp({
