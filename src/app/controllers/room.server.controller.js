@@ -18,9 +18,8 @@ exports.list = async (req, res) => {
 exports.create = async (req, res) => {
     try {
         const body = req.body;
-        console.log(body)
         if (!body.floor || body.floor <= 0 || body.floor == null) {
-            return handleError(res, 400, "floor not Invalid")
+            return handleError(res, 400, "Floor not Invalid")
         }
         if (!body.buildingId) {
             return handleError(res, 400, "Building null")
@@ -31,6 +30,13 @@ exports.create = async (req, res) => {
         }
         if (body.floor > checkBuilding.numberFloor) {
             return handleError(res, 400, "floor not available")
+        }
+        if (!body.roomName) {
+            return handleError(res, 400, "Room Name null")
+        }
+        const existRoom = await Room.findOne({buildingId: body.buildingId,roomName: body.roomName})
+        if(existRoom){
+            return handleError(res, 400, "Room exist in building")
         }
         const newItem = new Room(req.body)
         await newItem.save()

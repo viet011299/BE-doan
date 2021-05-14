@@ -8,6 +8,12 @@ module.exports = function (app) {
         .route('/meter')
         .get(meter.list)
         .post(meter.create)
+        app
+        .route('/get-all/meter')
+        .get(meter.getAll)
+        app
+        .route('/test')
+        .get(meter.test)
     app
         .route('/meter/:id')
         .get(meter.read)

@@ -18,7 +18,23 @@ exports.create = async (req, res) => {
     }
     const newDataMeter = new MeterData(body)
     await newDataMeter.save()
+    global.io.emit('new-data', body)
     return handleSuccess(res, 200, newDataMeter, "Success")
+  } catch (error) {
+    return handleError(res, 400, error.message)
+  }
+}
+exports.test = async (req, res) => {
+  try {
+    global.io.emit('new-data', 
+    { time: "2021-05-09T03:43:29.000Z",
+      meterId: "2002351090",
+      v: 220.1,
+      a: 0.103,
+      kWh: 3.01,
+      w: 14.72 }
+    )
+    return handleSuccess(res, 200, "", "Success")
   } catch (error) {
     return handleError(res, 400, error.message)
   }
@@ -61,11 +77,22 @@ exports.list = async (req, res) => {
     return handleError(res, 400, error.message)
   }
 }
+
+exports.getAll = async (req, res) => {
+  try {
+    const listMeter = await Meter.find();
+    const listData = await MeterData.find()
+    return handleSuccess(res, 200, { listMeter, listData }, "Get All")
+  } catch (error) {
+    return handleError(res, 400, error.message)
+  }
+}
+
 exports.read = async (req, res) => {
   try {
     const item = req.item
     const listData = await MeterData.find({ meterId: item.meterId })
-    handleSuccess(res, 200, {item,listData}, 'Success')
+    handleSuccess(res, 200, { item, listData }, 'Success')
   } catch (error) {
     handleError(res, 400, error.message)
   }

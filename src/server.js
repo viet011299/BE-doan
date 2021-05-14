@@ -2,6 +2,7 @@ const { DB, PORT, ENV } = require('./config/env/all')
 const moment = require('moment')
 const chalk = require('chalk')
 const logger = require('./config/logger')
+const socket = require("socket.io");
 function runBasicStaff() {
   const schedule = require('./config/schedule')
   const mongoose = require('mongoose')
@@ -23,8 +24,27 @@ function runBasicStaff() {
 }
 const db = runBasicStaff()
 const app = require('./config/strategies/express')(db)
-app.listen(PORT, () => {
+
+
+const server =app.listen(PORT, () => {
   console.log(`%s Server listen on port ${PORT} in ${ENV}`, chalk.green('✓'))
   logger('info', 'Sever Running')
 })
+
+const io = socket(server,{  cors: {
+  origin: '*',
+}});
+global.io = io; 
+let interval;
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
+
+
+
 module.exports = app
