@@ -18,7 +18,13 @@ exports.create = async (req, res) => {
     }
     const newDataMeter = new MeterData(body)
     await newDataMeter.save()
+    const fake = {...body}
+    fake.meterId ="2002351076" 
     global.io.emit('new-data', body)
+    global.io.emit(`new-data-${body.meterId}`, body)
+    const newDataMeterFake = new MeterData(fake)
+    await newDataMeterFake.save()
+    global.io.emit('new-data', fake)
     return handleSuccess(res, 200, newDataMeter, "Success")
   } catch (error) {
     return handleError(res, 400, error.message)
@@ -26,7 +32,7 @@ exports.create = async (req, res) => {
 }
 exports.test = async (req, res) => {
   try {
-    global.io.emit('new-data', 
+    global.io.emit('new-data-2002351090', 
     { time: "2021-05-09T03:43:29.000Z",
       meterId: "2002351090",
       v: 220.1,
@@ -97,15 +103,22 @@ exports.read = async (req, res) => {
     handleError(res, 400, error.message)
   }
 }
-
-exports.itemById = async (req, res, next, id) => {
+exports.readByMeterId = async (req, res) => {
   try {
-    if (!ObjectId.isValid(id)) {
-      return next(new Error('Id not ObjectId'))
-    }
-    const item = await Meter.findById({ _id: id })
+    const item = req.item
+    const listData = await MeterData.find({ meterId: item.meterId })
+    handleSuccess(res, 200, { item, listData }, 'Success')
+  } catch (error) {
+    handleError(res, 400, error.message)
+  }
+}
+
+
+exports.itemById = async (req, res, next, meterId) => {
+  try {
+    const item = await Meter.findOne({ meterId : meterId })
     if (!item) {
-      return next(new Error('Failed to load Meter ' + id))
+      return next(new Error('Failed to load Meter id ' + meterId))
     } else {
       req.item = item
       next()
