@@ -26,20 +26,25 @@ const db = runBasicStaff()
 const app = require('./config/strategies/express')(db)
 
 
-const server =app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`%s Server listen on port ${PORT} in ${ENV}`, chalk.green('✓'))
   logger('info', 'Sever Running')
 })
 
-const io = socket(server,{  cors: {
-  origin: '*',
-}});
-global.io = io; 
+const io = socket(server, {
+  cors: {
+    origin: '*',
+  }
+});
+global.io = io;
 let interval;
+const mongoose = require('mongoose')
+const Meter = mongoose.model('Meter')
+const MeterData = mongoose.model('MeterData')
 
 io.on("connection", (socket) => {
   console.log("New client connected");
-  socket.on("disconnect", () => {
+  socket.on("disconnect", () => {2
     console.log("Client disconnected");
   });
 });

@@ -7,6 +7,8 @@ const Building = mongoose.model('Building')
 const ObjectId = require('mongoose').Types.ObjectId;
 const helper = require('../libs/helper')
 const { handleError, handleSuccess } = require('../../config/response')
+const moment = require('moment')
+
 
 exports.create = async (req, res) => {
   try {
@@ -18,8 +20,8 @@ exports.create = async (req, res) => {
     }
     const newDataMeter = new MeterData(body)
     await newDataMeter.save()
-    global.io.emit('new-data', body)
-    global.io.emit(`new-data-${body.meterId}`, body)
+    global.io.emit('new-data', newDataMeter)
+    global.io.emit(`new-data-${body.meterId}`, newDataMeter)
     return handleSuccess(res, 200, newDataMeter, "Success")
   } catch (error) {
     return handleError(res, 400, error.message)
@@ -27,14 +29,31 @@ exports.create = async (req, res) => {
 }
 exports.test = async (req, res) => {
   try {
-    global.io.emit('new-data-2002351090', 
-    { time: "2021-05-09T03:43:29.000Z",
-      meterId: "2002351090",
-      v: 220.1,
-      a: 0.103,
-      kWh: 3.01,
-      w: 14.72 }
-    )
+    global.io.emit('new-data', {
+      "time": new Date(),
+      "meterId": "2002351090",
+      "v": 227.19,
+      "a": 80,
+      "kWh": 4.2,
+      "w": 45.69,
+    })
+    global.io.emit('new-data', {
+      "time": new Date(),
+      "meterId": "2002351076",
+      "v": 227.19,
+      "a": 80,
+      "kWh": 4.2,
+      "w": 45.69,
+    })
+ 
+    global.io.emit('new-data-2002351076', {
+      "time": new Date(),
+      "meterId": "2002351076",
+      "v": 100.19,
+      "a": 81,
+      "kWh": 4.1,
+      "w": 45.69,
+    })
     return handleSuccess(res, 200, "", "Success")
   } catch (error) {
     return handleError(res, 400, error.message)
@@ -91,10 +110,14 @@ exports.getAll = async (req, res) => {
 
 exports.read = async (req, res) => {
   try {
+    let startDate = moment(new Date(req.query.startDate)).startOf("day")
+    console.log(startDate);
+    let endDate = moment(new Date(req.query.endDate)).endOf("day")
+    console.log(endDate);
     const item = req.item
-    const count = await MeterData.countDocuments({ meterId: item.meterId })
-    const listData = await MeterData.find({ meterId: item.meterId }).skip(count-600)
-    handleSuccess(res, 200, { item, listData }, 'Success')
+    const listData = await MeterData.find({ meterId: item.meterId, time: { $gt: startDate, $lt: endDate } })
+    const lastItem = await MeterData.find({ meterId: item.meterId}).sort({ time: -1 }).limit(1)
+    handleSuccess(res, 200, { item, listData, lastItem: lastItem[0] }, 'Success')
   } catch (error) {
     handleError(res, 400, error.message)
   }
@@ -112,9 +135,9 @@ exports.readByMeterId = async (req, res) => {
 
 exports.itemById = async (req, res, next, meterId) => {
   try {
-    const item = await Meter.findOne({ meterId : meterId })
+    const item = await Meter.findOne({ meterId: meterId })
     if (!item) {
-      return next(new Error('Failed to load Meter id ' + meterId))
+      return next(new Error('Not found Meter id ' + meterId))
     } else {
       req.item = item
       next()

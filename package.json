@@ -61,6 +61,7 @@
     "sleep-promise": "^8.0.1",
     "smartmeter-obis": "^2.3.0",
     "socket.io": "^4.0.1",
+    "socket.io-client": "^4.1.2",
     "timekeeper": "^2.2.0",
     "uuid": "^8.0.0",
     "winston": "^3.2.1"
