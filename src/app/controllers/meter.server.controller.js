@@ -2,6 +2,7 @@ const _ = require('lodash')
 const mongoose = require('mongoose')
 const Meter = mongoose.model('Meter')
 const MeterData = mongoose.model('MeterData')
+const MeterEvent = mongoose.model('MeterEvent')
 const Room = mongoose.model('Room')
 const Building = mongoose.model('Building')
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -13,7 +14,10 @@ const moment = require('moment')
 exports.create = async (req, res) => {
   try {
     const body = req.body
-    const findMeter = await Meter.findOne({ meterId: body.meterId })
+    const queryFindMeter = Meter.findOne({ meterId: body.meterId })
+    const queryFindMeterEvent = MeterEvent.find({ meterId: body.meterId })
+    const findMeter = await queryFindMeter
+    const findMeterEvent = await queryFindMeterEvent
     if (!findMeter) {
       const newMeter = new Meter({ meterId: body.meterId })
       await newMeter.save()
@@ -22,10 +26,56 @@ exports.create = async (req, res) => {
     await newDataMeter.save()
     global.io.emit('new-data', newDataMeter)
     global.io.emit(`new-data-${body.meterId}`, newDataMeter)
+    for (let event in body.event) {
+      try {
+        const dataEvent = body.event[event]
+        const typeEvent = dataEvent.typeEvent
+        const valueEvent = dataEvent.value
+        const time = dataEvent.time.map((item, index) => {
+          return {
+            ...item,
+            value: typeEvent == 8 ? 0 : valueEvent[index],
+            type: typeEvent,
+            meterId: body.meterId
+          }
+        })
+        const listTypeEvent = findMeterEvent.filter(item => typeEvent == item.type)
+        const newData = _.differenceWith(time, listTypeEvent, (a, b) => {
+          const aStartDate = (new Date(a.start)).getTime()
+          const bStartDate = (new Date(b.start)).getTime()
+          return aStartDate == bStartDate
+        })
+        console.log(newData);
+        for (let data of newData) {
+          const newEvent = new MeterEvent(data)
+          await newEvent.save()
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
     return handleSuccess(res, 200, newDataMeter, "Success")
   } catch (error) {
     return handleError(res, 400, error.message)
   }
+}
+
+exports.analytics = async (req, res) => {
+  let startDate = moment(new Date(req.query.startDate)).startOf("day")
+  let endDate = moment(new Date(req.query.endDate)).endOf("day")
+  const item = req.item
+  const listData = await MeterEvent.find({ meterId: item.meterId }).or([{ start: { $gt: startDate, $lt: endDate } }, { end: { $gt: startDate, $lt: endDate } }]).sort({start:-1})
+  const result = {
+    1: [],
+    2: [],
+    3: [],
+    8: []
+  }
+  for (let item of listData) {
+   result[item.type].push(item)
+  }
+  return handleSuccess(res, 200, result, "Success")
 }
 exports.test = async (req, res) => {
   try {
@@ -45,7 +95,7 @@ exports.test = async (req, res) => {
       "kWh": 4.2,
       "w": 45.69,
     })
- 
+
     global.io.emit('new-data-2002351076', {
       "time": new Date(),
       "meterId": "2002351076",
@@ -111,12 +161,10 @@ exports.getAll = async (req, res) => {
 exports.read = async (req, res) => {
   try {
     let startDate = moment(new Date(req.query.startDate)).startOf("day")
-    console.log(startDate);
     let endDate = moment(new Date(req.query.endDate)).endOf("day")
-    console.log(endDate);
     const item = req.item
     const listData = await MeterData.find({ meterId: item.meterId, time: { $gt: startDate, $lt: endDate } })
-    const lastItem = await MeterData.find({ meterId: item.meterId}).sort({ time: -1 }).limit(1)
+    const lastItem = await MeterData.find({ meterId: item.meterId }).sort({ time: -1 }).limit(1)
     handleSuccess(res, 200, { item, listData, lastItem: lastItem[0] }, 'Success')
   } catch (error) {
     handleError(res, 400, error.message)

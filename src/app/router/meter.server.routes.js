@@ -18,7 +18,7 @@ module.exports = function (app) {
     .route('/meter/:id')
     .get(meter.read)
     .put(meter.update)
-
+  app.route('/meter/analytics/:id').get(meter.analytics)
   app.param('id', meter.itemById)
   app.route('/buildings/meter').get(building.getAll)
 }
