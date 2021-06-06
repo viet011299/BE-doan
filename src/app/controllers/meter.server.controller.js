@@ -45,7 +45,6 @@ exports.create = async (req, res) => {
           const bStartDate = (new Date(b.start)).getTime()
           return aStartDate == bStartDate
         })
-        console.log(newData);
         for (let data of newData) {
           const newEvent = new MeterEvent(data)
           await newEvent.save()

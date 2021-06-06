@@ -37,10 +37,6 @@ const io = socket(server, {
   }
 });
 global.io = io;
-let interval;
-const mongoose = require('mongoose')
-const Meter = mongoose.model('Meter')
-const MeterData = mongoose.model('MeterData')
 
 io.on("connection", (socket) => {
   console.log("New client connected");

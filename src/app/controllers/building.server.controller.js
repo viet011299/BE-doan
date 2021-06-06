@@ -33,6 +33,9 @@ exports.create = async (req, res) => {
   try {
     const body = req.body;
     body.buildingName = body.buildingName ? body.buildingName.toUpperCase() : ""
+    if( body.numberFloor){
+      console.log(body.numberFloor);
+    }
     const newItem = new Building(body)
     await newItem.save()
     return handleSuccess(res, 200, newItem, "Success")
@@ -64,7 +67,6 @@ exports.getAll = async (req, res) => {
   try {
     const list = await Building.find();
     const result = []
-    console.log("a");
     for (let i = 0; i < list.length; i++) {
       const item = list[i]
       const listFools = []
@@ -95,6 +97,12 @@ exports.update = async (req, res) => {
     const body = req.body
     if (body.buildingName) {
       body.buildingName = body.buildingName.toUpperCase()
+    }
+    if( body.numberFloor){
+      console.log(body.numberFloor);
+      if(body.numberFloor<=0 || body.numberFloor>100){
+        return handleError(res, 400,"Number floor is than less 100")
+      }
     }
     _.assignIn(item, body)
     await item.save()
