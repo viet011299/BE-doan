@@ -99,7 +99,6 @@ exports.update = async (req, res) => {
       body.buildingName = body.buildingName.toUpperCase()
     }
     if( body.numberFloor){
-      console.log(body.numberFloor);
       if(body.numberFloor<=0 || body.numberFloor>100){
         return handleError(res, 400,"Number floor is than less 100")
       }

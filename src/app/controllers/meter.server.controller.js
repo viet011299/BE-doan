@@ -64,7 +64,7 @@ exports.analytics = async (req, res) => {
   let startDate = moment(new Date(req.query.startDate)).startOf("day")
   let endDate = moment(new Date(req.query.endDate)).endOf("day")
   const item = req.item
-  const listData = await MeterEvent.find({ meterId: item.meterId }).or([{ start: { $gt: startDate, $lt: endDate } }, { end: { $gt: startDate, $lt: endDate } }]).sort({start:-1})
+  const listData = await MeterEvent.find({ meterId: item.meterId }).or([{ start: { $gt: startDate, $lt: endDate } }, { end: { $gt: startDate, $lt: endDate } }]).sort({ start: -1 })
   const result = {
     1: [],
     2: [],
@@ -72,7 +72,7 @@ exports.analytics = async (req, res) => {
     8: []
   }
   for (let item of listData) {
-   result[item.type].push(item)
+    result[item.type].push(item)
   }
   return handleSuccess(res, 200, result, "Success")
 }
@@ -95,7 +95,7 @@ exports.test = async (req, res) => {
       "w": 45.69,
     })
 
-    global.io.emit('new-data-2002351076', {
+    global.io.emit('new-data-2002351090', {
       "time": new Date(),
       "meterId": "2002351076",
       "v": 100.19,
@@ -125,6 +125,10 @@ exports.update = async (req, res) => {
       const checkRoom = await Room.findOne({ _id: body.roomId, buildingId: body.buildingId })
       if (!checkRoom) {
         return handleError(res, 400, "Room don't exist")
+      }
+      const checkExitsMeter = await Meter.findOne({ roomId: body.roomId, buildingId: body.buildingId })
+      if (checkExitsMeter && checkExitsMeter.meterId != item.meterId) {
+        return handleError(res, 400, "Room had meter")
       }
       body["buildingName"] = checkBuildingId.buildingName
       body["roomName"] = checkRoom.roomName
